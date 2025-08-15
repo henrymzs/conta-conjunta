@@ -1,0 +1,42 @@
+
+services:
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  backend:
+    build: ./backend
+    volumes:
+      - ./backend:/backend
+      - /backend/node_modules
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: "postgresql://postgres:postgres@db:5432/postgres"
+    ports:
+      - "3000:3000"
+    command: sh -c "npm install && npx prisma generate && npm start"
+
+  studio:
+    image: node:18
+    working_dir: /backend
+    volumes:
+      - ./backend:/backend
+      - /backend/node_modules
+    command: sh -c "npm install && npx prisma generate && npx prisma studio"
+    ports:
+      - "5555:5555"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: "postgresql://postgres:postgres@db:5432/postgres"
+
+volumes:
+  db_data:
