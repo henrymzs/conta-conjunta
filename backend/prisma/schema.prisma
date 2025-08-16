@@ -14,11 +14,61 @@ datasource db {
 }
 
 model Usuario {
-  id           String         @id @default(uuid())
-  email        String         @unique
-  telefone     String         @unique
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
+  id           String   @id @default(uuid())
+  nome         String
+  telefone     String   @unique
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  @@unique([email, telefone])
+  contas        Conta[]         @relation("CriadorDasContas")
+  participacoes Participante[]
+  notificacoes  Notificacao[]
+}
+
+model Conta {
+  id              String    @id @default(uuid())
+  nome            String
+  valor_total     Decimal   @db.Decimal(10, 2)
+  data_vencimento DateTime
+  chave_pix       String
+  criador_id      String
+  createdAt       DateTime  @default(now())
+
+  criador         Usuario   @relation("CriadorDasContas", fields: [criador_id], references: [id])
+  participantes   Participante[]
+  notificacoes    Notificacao[]
+}
+
+model Participante {
+  id             String          @id @default(uuid())
+  conta_id       String
+  usuario_id     String
+  valor_dividido Decimal         @db.Decimal(10, 2)
+  status         StatusPagamento @default(PENDENTE)
+  data_pagamento DateTime?
+
+  conta   Conta   @relation(fields: [conta_id], references: [id])
+  usuario Usuario @relation(fields: [usuario_id], references: [id])
+}
+
+model Notificacao {
+  id         String            @id @default(uuid())
+  conta_id   String
+  usuario_id String
+  status     StatusNotificacao @default(PENDENTE)
+  data_envio DateTime?
+
+  conta   Conta   @relation(fields: [conta_id], references: [id])
+  usuario Usuario @relation(fields: [usuario_id], references: [id])
+}
+
+enum StatusPagamento {
+  PENDENTE
+  CONFIRMADO
+}
+
+enum StatusNotificacao {
+  PENDENTE
+  CONFIRMADO
+  FALHOU
 }
