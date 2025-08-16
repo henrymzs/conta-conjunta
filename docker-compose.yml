@@ -22,7 +22,7 @@ services:
       DATABASE_URL: "postgresql://postgres:postgres@db:5432/postgres"
     ports:
       - "3000:3000"
-    command: sh -c "npm install && npx prisma generate && npm start"
+    command: sh -c "npm install && npx prisma generate && npm run dev"
 
   studio:
     image: node:18
