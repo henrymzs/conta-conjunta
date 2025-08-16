@@ -2,11 +2,11 @@ FROM node:24.4.1-alpine
 
 WORKDIR /backend
 
-COPY . .
-
-RUN rm -rf node_modules
+COPY package*.json ./
 RUN npm install
 
-CMD ["npm", "start"]
+COPY . .
 
 EXPOSE 3000
+
+CMD ["npm", "run", "dev"]
