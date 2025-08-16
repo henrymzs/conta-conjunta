@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon src/index.js",
+    "dev": "nodemon",
     "start": "node src/index.js"
   },
   "keywords": [],
@@ -16,5 +16,8 @@
     "@prisma/client": "^6.14.0",
     "express": "^5.1.0",
     "prisma": "^6.14.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.10"
   }
 }
