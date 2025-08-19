@@ -12,19 +12,17 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
-
 model Usuario {
-  id           String   @id @default(uuid())
-  nome         String
-  telefone     String   @unique
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  id         String   @id @default(uuid()) 
+  telegramId Int      @unique              
+  nome       String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   contas        Conta[]         @relation("CriadorDasContas")
   participacoes Participante[]
   notificacoes  Notificacao[]
 }
-
 model Conta {
   id              String    @id @default(uuid())
   nome            String
@@ -38,7 +36,6 @@ model Conta {
   participantes   Participante[]
   notificacoes    Notificacao[]
 }
-
 model Participante {
   id             String          @id @default(uuid())
   conta_id       String
@@ -50,7 +47,6 @@ model Participante {
   conta   Conta   @relation(fields: [conta_id], references: [id])
   usuario Usuario @relation(fields: [usuario_id], references: [id])
 }
-
 model Notificacao {
   id         String            @id @default(uuid())
   conta_id   String
@@ -61,12 +57,10 @@ model Notificacao {
   conta   Conta   @relation(fields: [conta_id], references: [id])
   usuario Usuario @relation(fields: [usuario_id], references: [id])
 }
-
 enum StatusPagamento {
   PENDENTE
   CONFIRMADO
 }
-
 enum StatusNotificacao {
   PENDENTE
   CONFIRMADO
