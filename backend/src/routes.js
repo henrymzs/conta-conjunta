@@ -1,4 +1,5 @@
 import express from 'express';
+import { usuarioController } from './controllers/usuarioController.js';
 const router = express.Router();
 
 router.get('/', (req, res) => {
@@ -14,5 +15,6 @@ router.post('/mensagem', (req, res) => {
   res.status(200).json({ message: 'mensagem salva com sucesso' })
 })
 
+router.post('/usuarios', usuarioController.create);
 
 export default router;
