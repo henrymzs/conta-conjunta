@@ -4,14 +4,13 @@ import 'dotenv/config'
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
-bot.command('help', (ctx) => {
+bot.command('start', (ctx) => {
   ctx.reply(
     `Comandos disponíveis:
-/help - Lista todos os comandos
+/start - Lista todos os comandos
+/criar_conta - Crie sua conta para que você comece a salvar suas contas
 /salvar_conta - Mande informações da sua conta para que possamos salvar(ex: Conta de Luz)
-/minhas_contas - Visualizar suas contas cadastradas
-/participantes - Gerenciar participantes de uma conta
-/pegar_toke - Gere token de suas contas para compartilhar com outras pessoas e enviar notificações`
+`
   );
 });
 
@@ -32,18 +31,58 @@ bot.command('criar_conta', async (ctx) => {
   }
 });
 
-bot.on('text', async (ctx) => {
-  ctx.reply(
-    `Olá ${ctx.from.first_name}! 👋
-Eu sou seu assistente de contas compartilhadas.
-Você pode usar os seguintes comandos:
+const state = {};
+bot.command('salvar_conta', (ctx) => {
+  const telegramId = ctx.from.id;
 
-/help - Lista todos os comandos
-/salvar_conta - Mande informações da sua conta para que possamos salvar(ex: Conta de Luz)
-/minhas_contas - Visualizar suas contas cadastradas
-/participantes - Gerenciar participantes de uma conta
-/pegar_toke - Gere token de suas contas para compartilhar com outras pessoas e enviar notificações`
-  );
+  state[telegramId] = { step: 1, data: {} };
+
+  ctx.reply('Qual o nome da conta?');
+});
+
+bot.on('text', async (ctx) => {
+  const telegramId = ctx.from.id;
+  if (!state[telegramId]) return;
+  const userStep = state[telegramId].step;
+  const userData = state[telegramId].data;
+
+  if (userStep === 1) {
+    userData.nomeConta = ctx.message.text;
+    state[telegramId].step = 2;
+    ctx.reply('Qual a data de vencimento? (DD/MM/AAAA)');
+  } 
+  
+  else if (userStep === 2) {
+    userData.vencimento = ctx.message.text;
+    state[telegramId].step = 3;
+    ctx.reply('Qual o valor da conta?');
+  } 
+  
+  else if (userStep === 3) {
+    userData.valor = ctx.message.text;
+    state[telegramId].step = 4;
+    ctx.reply('Informe a chave Pix (ou digite "pular")');
+  } 
+  
+  else if (userStep === 4) {
+    userData.chavePix = ctx.message.text.toLowerCase() === 'pular' ? null : ctx.message.text;
+
+    try {
+      await axios.post(`${process.env.API_URL}/contas`, {
+        telegramId: telegramId,
+        nome: userData.nomeConta,
+        dataDeVencimento: userData.vencimento,
+        valorTotal: userData.valor,
+        chavePix: userData.chavePix,  
+      });
+
+      ctx.reply(`Conta "${userData.nomeConta}" salva com sucesso!`);
+    } catch (error) {
+      console.error('Erro ao salvar conta: ', error.response?.data || error.message);
+      ctx.reply('Ocorreu um erro ao salvar a conta, tente novamente.');
+    }
+    delete state[telegramId];
+  }
 });
 
 bot.launch().then(() => {
