@@ -16,5 +16,6 @@ router.post('/mensagem', (req, res) => {
 })
 
 router.post('/usuarios', usuarioController.create);
+router.post('/contas', usuarioController.createCount);
 
 export default router;
