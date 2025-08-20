@@ -11,5 +11,17 @@ export const usuarioRepository = {
         return await prisma.usuario.findUnique({
             where: { telegramId },
         });
-    }
+    },
+
+    async createCount({ nome, dataDeVencimento, valorTotal, chavePix, criadorId }) {
+        return await prisma.conta.create({
+            data: { 
+                nome, 
+                valor_total: valorTotal, 
+                data_vencimento: dataDeVencimento, 
+                chave_pix: chavePix,
+                criador_id: criadorId,
+             }
+        }); 
+    },
 };
