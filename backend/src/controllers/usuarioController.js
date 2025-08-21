@@ -4,7 +4,7 @@ export const usuarioController = {
     async create(req, res) {
         try {
             const { telegramId, nome, telefone } = req.body;
-            const usuario = await usuarioService.createUser({telegramId, nome, telefone});
+            const usuario = await usuarioService.createUser({ telegramId, nome, telefone });
             return res.status(201).json(usuario);
         } catch (error) {
             return res.status(400).json({ erro: error.message });
@@ -22,5 +22,15 @@ export const usuarioController = {
         } catch (error) {
             return res.status(400).json({ error: error.message });
         }
-    }
+    },
+
+    async listAccounts(req, res) {
+        try {
+            const telegramId = parseInt(req.params.telegramId);
+            const contas = await usuarioService.listAccounts({ telegramId });
+            return res.status(200).json(contas);
+        } catch (error) {
+            return res.status(400).json({ error: error.message });
+        }
+    },
 };
