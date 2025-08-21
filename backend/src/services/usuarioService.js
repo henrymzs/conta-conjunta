@@ -1,13 +1,13 @@
 import { usuarioRepository } from "../repositories/usuarioRepository.js";
-import { parseDateUser, validateFutureDate } from "../utils/dateTime.js";
+import { formatDateUser, parseDateUser, validateFutureDate } from "../utils/dateTime.js";
 
 export const usuarioService = {
-    async createUser({telegramId, nome, telefone}) {
+    async createUser({ telegramId, nome, telefone }) {
         const existente = await usuarioRepository.searchByTelegramId(telegramId);
         if (existente) {
             throw new Error('Usuário já cadastrado com esse Telegram ID');
         }
-        return await usuarioRepository.createUser({telegramId, nome, telefone});
+        return await usuarioRepository.createUser({ telegramId, nome, telefone });
     },
 
     async createCount({ nome, dataDeVencimento, valorTotal, chavePix, telegramId }) {
@@ -36,4 +36,17 @@ export const usuarioService = {
             throw new Error('Erro ao criar a conta.');
         }
     },
+
+    async listAccounts({ telegramId }) {
+        const usuario = await usuarioRepository.searchByTelegramId(telegramId);
+        if (!usuario) {
+            throw new Error('Usuário não encontrado.');
+        }
+        const contas = await usuarioRepository.listAccounts(usuario.id);
+        return contas.map(conta => ({
+            ...conta,
+            data_vencimento_formatada: formatDateUser(conta.data_vencimento)
+        }));
+    }
+
 };
