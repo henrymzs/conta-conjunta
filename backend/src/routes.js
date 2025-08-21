@@ -17,5 +17,6 @@ router.post('/mensagem', (req, res) => {
 
 router.post('/usuarios', usuarioController.create);
 router.post('/contas', usuarioController.createCount);
+router.get('/contas/:telegramId', usuarioController.listAccounts);
 
 export default router;
