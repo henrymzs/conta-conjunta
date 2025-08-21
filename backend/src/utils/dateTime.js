@@ -14,3 +14,8 @@ export function validateFutureDate(data) {
         throw new Error('A data de vencimento não pode ser no passada.');
     } 
 }
+
+export function formatDateUser(date) {
+  if (!(date instanceof Date)) date = new Date(date);
+  return date.toLocaleDateString('pt-BR');
+}
