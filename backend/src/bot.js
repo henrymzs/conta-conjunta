@@ -10,9 +10,32 @@ bot.command('start', (ctx) => {
 /start - Lista todos os comandos
 /criar_conta - Crie sua conta para que você comece a salvar suas contas
 /salvar_conta - Mande informações da sua conta para que possamos salvar(ex: Conta de Luz)
+/lista_contas - Receba uma lista de todas as suas contas salvas
 `
   );
 });
+
+bot.command('listar_contas', async (ctx) => {
+  const telegramId = ctx.from.id;
+  try {
+    const { data } = await axios.get(`${process.env.API_URL}/contas/${telegramId}`);
+    if (data.length === 0) {
+      ctx.reply('Você não possui contas cadastradas.');
+      return;
+    }
+
+    let resposta = 'Suas contas:\n\n';
+    data.forEach((conta) => {
+      resposta += `Nome da Conta: ${conta.nome}\nValor Total: RS${conta.valor_total}\nData de Vencimento: ${(conta.data_vencimento_formatada)}\n\n`;
+    });
+
+    ctx.reply(resposta);
+  } catch (error) {
+    console.error('Erro ao listar contas: ', error.response?.data || error.message);
+    ctx.reply('Ocorreu um erro ao listar suas contas. Tente novamente.');
+  }
+});
+
 
 bot.command('criar_conta', async (ctx) => {
   const telegramId = ctx.from.id;
