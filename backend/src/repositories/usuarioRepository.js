@@ -15,13 +15,19 @@ export const usuarioRepository = {
 
     async createCount({ nome, dataDeVencimento, valorTotal, chavePix, criadorId }) {
         return await prisma.conta.create({
-            data: { 
-                nome, 
-                valor_total: valorTotal, 
-                data_vencimento: dataDeVencimento, 
+            data: {
+                nome,
+                valor_total: valorTotal,
+                data_vencimento: dataDeVencimento,
                 chave_pix: chavePix,
                 criador_id: criadorId,
-             }
-        }); 
+            }
+        });
+    },
+
+    async listAccounts(usuarioId) {
+        return await prisma.conta.findMany({
+            where: { criador_id: usuarioId },
+        });
     },
 };
