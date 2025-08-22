@@ -33,4 +33,17 @@ export const usuarioController = {
             return res.status(400).json({ error: error.message });
         }
     },
+
+    async addParticipant(req, res) {
+        const { contaId } = req.params;
+        const { telegramIdCriador, telegramIdConvidado } = req.body;
+        const telegramIdCriadorInt = parseInt(telegramIdCriador);
+        const telegramIdConvidadoInt = parseInt(telegramIdConvidado);
+        try {
+            await usuarioService.addParticipant({ contaId, telegramIdCriador: telegramIdCriadorInt, telegramIdConvidado: telegramIdConvidadoInt });
+            res.status(201).json({ sucesso: true });
+        } catch (error) {
+            res.status(400).json({ erro: error.message });
+        }
+    }
 };
