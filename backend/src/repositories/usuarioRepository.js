@@ -30,4 +30,23 @@ export const usuarioRepository = {
             where: { criador_id: usuarioId },
         });
     },
+
+    async searchAccountById(contaId){
+        return await prisma.conta.findUnique({
+            where: { id: contaId }
+        });
+    },
+
+    async searchParticipant({ contaId, usuarioId }) {
+        return await prisma.participante.findFirst({
+            where: {
+                conta_id: contaId,
+                usuario_id: usuarioId,
+            }
+        });
+    },
+
+    async create(data) {
+        return await prisma.participante.create({ data });
+    },
 };
