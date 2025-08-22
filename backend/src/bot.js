@@ -11,9 +11,26 @@ bot.command('start', (ctx) => {
 /criar_conta - Crie sua conta para que você comece a salvar suas contas
 /salvar_conta - Mande informações da sua conta para que possamos salvar(ex: Conta de Luz)
 /lista_contas - Receba uma lista de todas as suas contas salvas
+/adicionar_participantes - Adicione participantes as suas contas
 `
   );
 });
+
+bot.command('adicionar_participantes', async (ctx) => {
+  const telegramIdCriador = ctx.from.id;
+  const [_, contaId, telegramIdConvidado] = ctx.message.text.split(' ');
+
+  try {
+    await axios.post(`${process.env.API_URL}/contas/${contaId}/participantes`, {
+      telegramIdCriador,
+      telegramIdConvidado,
+    });
+    ctx.reply('Convite enviado com sucesso');
+  } catch (error) {
+    console.error('Erro ao adicionar participantes: ', error.response?.data || error.message);
+    ctx.reply('Ocorreu ao adicionar participantes. Tente novamente.');
+  }
+})
 
 bot.command('listar_contas', async (ctx) => {
   const telegramId = ctx.from.id;
