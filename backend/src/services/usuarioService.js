@@ -47,6 +47,38 @@ export const usuarioService = {
             ...conta,
             data_vencimento_formatada: formatDateUser(conta.data_vencimento)
         }));
+    },
+
+    async addParticipant({ contaId, telegramIdCriador, telegramIdConvidado }) {
+        const criador = await usuarioRepository.searchByTelegramId(telegramIdCriador);
+        if (!criador) {
+            throw new Error('Criador não encontrado');
+        }
+
+        const conta = await usuarioRepository.searchAccountById(contaId);
+        if (!conta || conta.criador_id !== criador.id) {
+            throw new Error('Conta inválida ou não pertence ao criador');
+        }
+
+        if (isNaN(telegramIdConvidado) || isNaN(telegramIdConvidado)) {
+            throw new Error('IDs do telegram precisam ser números.');   
+        }
+
+        let convidado = await usuarioRepository.searchByTelegramId(telegramIdConvidado);
+        if (!convidado) {
+            throw new Error('Usuário convidado não possui conta no sistema.');
+        }
+        const jaParticipa = await usuarioRepository.searchParticipant({ contaId, usuarioId: convidado.id });
+        if (!jaParticipa) {
+            throw new Error('Usuário já é participante.');
+        }
+
+        await usuarioRepository.createParticipant({
+            conta_id: contaId,
+            usuario_id: convidado.id,
+            valor_divido: 0,
+            status: 'PENDENTE',
+        });
     }
 
 };
